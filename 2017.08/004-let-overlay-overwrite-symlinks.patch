@@ -1,0 +1,22 @@
+Allow buildroot overlay to overwrite existing symlinks
+
+Otherwise the symlink /var/spool->../tmp exists further and the
+crontabs are copied to /tmp, at which place a tmpfs is mounted
+and thus the crontabs are not visible any more.
+
+With this patch the symlink /var/spool is replaced by the folder
+of the overlay and 'crontab -l' shows the crontab of the overlay.
+
+diff --git a/Makefile b/Makefile
+index 6dd9c6fd70..34bdd76906 100644
+--- a/Makefile
++++ b/Makefile
+@@ -723,7 +723,7 @@ endif
+ 
+ 	@$(foreach d, $(call qstrip,$(BR2_ROOTFS_OVERLAY)), \
+ 		$(call MESSAGE,"Copying overlay $(d)"); \
+-		rsync -a --ignore-times --keep-dirlinks $(RSYNC_VCS_EXCLUSIONS) \
++		rsync -a --ignore-times $(RSYNC_VCS_EXCLUSIONS) \
+ 			--chmod=u=rwX,go=rX --exclude .empty --exclude '*~' \
+ 			$(d)/ $(TARGET_DIR)$(sep))
+ 

@@ -1,0 +1,20 @@
+Add 'Zapping VBI library' dependency to FFMPEG
+
+Without this dependency (the patched) ffmpeg does not compile.
+
+diff --git a/package/ffmpeg/ffmpeg.mk b/package/ffmpeg/ffmpeg.mk
+index 726110a09..068159fa5 100644
+--- a/package/ffmpeg/ffmpeg.mk
++++ b/package/ffmpeg/ffmpeg.mk
+@@ -80,6 +80,11 @@ else
+ FFMPEG_CONF_OPTS += --disable-ffmpeg
+ endif
+ 
++ifeq ($(BR2_PACKAGE_ZVBI),y)
++FFMPEG_DEPENDENCIES += zvbi
++FFMPEG_CONF_OPTS += --enable-libzvbi
++endif
++
+ ifeq ($(BR2_PACKAGE_FFMPEG_FFPLAY),y)
+ FFMPEG_DEPENDENCIES += sdl2
+ FFMPEG_CONF_OPTS += --enable-ffplay

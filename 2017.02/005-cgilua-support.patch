@@ -1,0 +1,108 @@
+CGILua (BR2_PACKAGE_CGILUA=y) is used to interpret lua code inside of
+wegpages, see [1] for more information.
+
+In the lighttpd fastcgi.conf we have to define which pages shall be
+parsed by the cgilua script:
+
+fastcgi.server = ( 
+  "inhalt_pages.xml" => (( 
+   "max-procs" => 1,
+   "check-local" => "disable",
+   "socket" => "/tmp/luaxml-fastcgi.socket",
+   "docroot" => "/var/www/data/default/",
+   "bin-path" => "/usr/bin/cgilua.fcgi"
+  )),
+
+Inside this page, the lua code can be inserted like this:
+
+<?       
+	days = {"Sunday", "Monday", "Tuesday", "Wednesday",
+	        "Thursday", "Friday", "Saturday"}
+	for i,v in ipairs(days) do print(v) end   
+?>
+
+
+
+
+[1] https://keplerproject.github.io/cgilua/manual.html#templates
+
+
+diff --git a/package/cgilua/001-fix-wsapi-call.patch b/package/cgilua/001-fix-wsapi-call.patch
+new file mode 100644
+index 0000000..7422f1d
+--- /dev/null
++++ b/package/cgilua/001-fix-wsapi-call.patch
+@@ -0,0 +1,30 @@
++diff -Naur cgilua-5.1.4-2_ORIG/cgilua-5.1.4/src/launchers/cgilua.fcgi cgilua-5.1.4-2/cgilua-5.1.4/src/launchers/cgilua.fcgi
++--- cgilua-5.1.4-2_ORIG/cgilua-5.1.4/src/launchers/cgilua.fcgi	2010-03-22 21:05:00.000000000 +0100
+++++ cgilua-5.1.4-2/cgilua-5.1.4/src/launchers/cgilua.fcgi	2017-11-17 09:04:58.200342430 +0100
++@@ -1,19 +1,9 @@
++ #!/usr/bin/env lua
++ 
++--- CGILua (SAPI) launcher, extracts script to launch
++--- either from the command line (use #!cgilua in the script)
++--- or from SCRIPT_FILENAME/PATH_TRANSLATED
++-
++ pcall(require, "luarocks.require")
++ 
++ local common = require "wsapi.common"
++-
++-local ok, err = pcall(require, "wsapi.fastcgi")
++-
++-if not ok then
++-  io.stderr:write("WSAPI FastCGI not loaded:\n" .. err .. "\n\nPlease install wsapi-fcgi with LuaRocks\n")
++-  os.exit(1)
++-end
+++local fastcgi = require "wsapi.fastcgi"
++ 
++ local ONE_HOUR = 60 * 60
++ local ONE_DAY = 24 * ONE_HOUR
++@@ -30,4 +20,4 @@
++      "PATH_TRANSLATED" } 
++ }
++ 
++-wsapi.fastcgi.run(sapi_loader)
+++fastcgi.run(sapi_loader)
+diff --git a/package/cgilua/002-add-xml-html-parsing-support.patch b/package/cgilua/002-add-xml-html-parsing-support.patch
+new file mode 100644
+index 0000000..4443b95
+--- /dev/null
++++ b/package/cgilua/002-add-xml-html-parsing-support.patch
+@@ -0,0 +1,37 @@
++diff -Naur cgilua-5.1.4-2_ORIG/cgilua-5.1.4/src/cgilua/cgilua.lua cgilua-5.1.4-2/cgilua-5.1.4/src/cgilua/cgilua.lua
++--- cgilua-5.1.4-2_ORIG/cgilua-5.1.4/src/cgilua/cgilua.lua	2010-03-22 21:05:00.000000000 +0100
+++++ cgilua-5.1.4-2/cgilua-5.1.4/src/cgilua/cgilua.lua	2017-11-17 09:08:16.391882581 +0100
++@@ -92,6 +92,10 @@
++ end
++ local htmlheader = htmlheader
++ 
+++function xmlheader()
+++        SAPI.Response.contenttype ("text/xml")
+++end
+++
++ ----------------------------------------------------------------------------
++ -- Sends an HTTP header redirecting the browser to another URL
++ -- @param url String with the URL.
++@@ -281,6 +285,11 @@
++   htmlheader ()
++   lp.include (filename, env)
++ end
+++function handlelp_xml (filename, env)
+++  env = env or buildscriptenv()
+++  xmlheader ()
+++  lp.include (filename, env)
+++end
++ 
++ ----------------------------------------------------------------------------
++ -- Builds a handler that sends a header and the contents of the given file.
++@@ -600,6 +609,10 @@
++         -- Default handler values
++         addscripthandler ("lua", doscript)
++         addscripthandler ("lp", handlelp)
+++
+++        -- WORK specific, to parse HTML and XML pages as well
+++        addscripthandler ("html", handlelp)
+++        addscripthandler ("xml", handlelp_xml)
++         -- Looks for an optional loader module
++         pcall (function () _G.require"cgilua.loader" end)
++ 

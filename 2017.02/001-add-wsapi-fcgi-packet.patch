@@ -1,0 +1,60 @@
+Adding wsapi-fcgi packet to buildroot
+
+diff --git a/package/Config.in b/package/Config.in
+index 9d668bf..cd0b969 100644
+--- a/package/Config.in
++++ b/package/Config.in
+@@ -546,6 +546,7 @@ menu "Lua libraries/modules"
+ 	source "package/rings/Config.in"
+ 	source "package/turbolua/Config.in"
+ 	source "package/wsapi/Config.in"
++	source "package/wsapi-fcgi/Config.in"
+ 	source "package/xavante/Config.in"
+ endmenu
+ endif
+diff --git a/package/wsapi-fcgi/Config.in b/package/wsapi-fcgi/Config.in
+new file mode 100644
+index 0000000..e84ec18
+--- /dev/null
++++ b/package/wsapi-fcgi/Config.in
+@@ -0,0 +1,9 @@
++config BR2_PACKAGE_WSAPI_FCGI
++	bool "wsapi FCGI"
++	# Runtime dependency only
++	select BR2_PACKAGE_LIBFCGI
++	depends on  BR2_PACKAGE_WSAPI
++	help
++	  API that abstracts the web server from Lua web applications.
++
++	  http://keplerproject.github.com/wsapi/
+diff --git a/package/wsapi-fcgi/wsapi.hash b/package/wsapi-fcgi/wsapi.hash
+new file mode 100644
+index 0000000..1348ca3
+--- /dev/null
++++ b/package/wsapi-fcgi/wsapi.hash
+@@ -0,0 +1,2 @@
++# locally computed hash
++sha256 73dc200889bc185953cd3a7c5350c998c090f901fcd10771273b7a63a3ffcdcf wsapi-fcgi-1.6.1-1.src.rock
+diff --git a/package/wsapi-fcgi/wsapi.mk b/package/wsapi-fcgi/wsapi.mk
+new file mode 100644
+index 0000000..d17f514
+--- /dev/null
++++ b/package/wsapi-fcgi/wsapi.mk
+@@ -0,0 +1,17 @@
++################################################################################
++#
++# wsapi-fcgi
++#
++################################################################################
++
++WSAPI_FCGI_VERSION = 1.6.1-1
++WSAPI_ARCH_VERSION = 1.6.1
++WSAPI_FCGI_LICENSE = MIT
++
++define WSAPI_FCGI_INSTALL_TARGET_CMDS
++	cd $(BUILD_DIR)/wsapi-fcgi-$(WSAPI_FCGI_VERSION)/wsapi-$(WSAPI_ARCH_VERSION)/ && \
++		$(LUAROCKS_RUN_ENV) flock $(TARGET_DIR) \
++		$(LUAROCKS_RUN_CMD) make --keep $(WSAPI_FCGI_ROCKSPEC) $(WSAPI_FCGI_BUILD_OPTS)
++endef
++
++$(eval $(luarocks-package))

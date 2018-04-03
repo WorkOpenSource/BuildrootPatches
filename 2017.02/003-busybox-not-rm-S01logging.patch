@@ -1,0 +1,19 @@
+Do not remove S01logging by busybox
+
+This patch prevents that S01logging from rsyslog is removed accidently
+by busybox (because it _can_ be configured as syslog-daemon, but isn't)
+whenever busybox.config is changed.
+
+diff --git a/package/busybox/busybox.mk b/package/busybox/busybox.mk
+index 577f2f247..3f4260be9 100644
+--- a/package/busybox/busybox.mk
++++ b/package/busybox/busybox.mk
+@@ -175,7 +175,7 @@ define BUSYBOX_INSTALL_LOGGING_SCRIPT
+ 	if grep -q CONFIG_SYSLOGD=y $(@D)/.config; then \
+ 		$(INSTALL) -m 0755 -D package/busybox/S01logging \
+ 			$(TARGET_DIR)/etc/init.d/S01logging; \
+-	else rm -f $(TARGET_DIR)/etc/init.d/S01logging; fi
++	fi
+ endef
+ 
+ ifeq ($(BR2_INIT_BUSYBOX),y)

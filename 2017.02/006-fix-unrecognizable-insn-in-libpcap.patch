@@ -1,0 +1,21 @@
+diff --git a/package/libpcap/libpcap.hash b/package/libpcap/libpcap.hash
+index 6894046..9255e83 100644
+--- a/package/libpcap/libpcap.hash
++++ b/package/libpcap/libpcap.hash
+@@ -1,2 +1,2 @@
+ # Locally calculated after checking pgp signature
+-sha256	673dbc69fdc3f5a86fb5759ab19899039a8e5e6c631749e48dcd9c6f0c83541e	libpcap-1.8.1.tar.gz
++sha256	5db3e2998f1eeba2c76da55da5d474248fe19c44f49e15cac8a796a2c7e19690	libpcap-1.6.2.tar.gz
+diff --git a/package/libpcap/libpcap.mk b/package/libpcap/libpcap.mk
+index c4c5f31..090c0f6 100644
+--- a/package/libpcap/libpcap.mk
++++ b/package/libpcap/libpcap.mk
+@@ -4,7 +4,7 @@
+ #
+ ################################################################################
+ 
+-LIBPCAP_VERSION = 1.8.1
++LIBPCAP_VERSION = 1.6.2
+ LIBPCAP_SITE = http://www.tcpdump.org/release
+ LIBPCAP_LICENSE = BSD-3-Clause
+ LIBPCAP_LICENSE_FILES = LICENSE
