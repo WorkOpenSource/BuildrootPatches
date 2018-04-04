@@ -1,40 +1,46 @@
-Do not block stdout when started application with start-stop-daemon
-
---- busybox-1.21.0/debianutils/start_stop_daemon.c	2012-12-22 23:38:59.000000000 +0100
-+++ busybox-1.21.0_patched/debianutils/start_stop_daemon.c	2016-09-28 12:06:33.424959669 +0200
-@@ -485,7 +485,7 @@
- 	*--argv = startas;
- 	if (opt & OPT_BACKGROUND) {
- #if BB_MMU
--		bb_daemonize(DAEMON_DEVNULL_STDIO + DAEMON_CLOSE_EXTRA_FDS + DAEMON_DOUBLE_FORK);
-+		bb_daemonize(DAEMON_DOUBLE_FORK | DAEMON_NO_DUP2);
- 		/* DAEMON_DEVNULL_STDIO is superfluous -
- 		 * it's always done by bb_daemonize() */
- #else
---- busybox-1.21.0/libbb/vfork_daemon_rexec.c	2012-12-22 23:39:00.000000000 +0100
-+++ busybox-1.21.0_patched/libbb/vfork_daemon_rexec.c	2016-09-28 12:06:03.593426248 +0200
-@@ -255,9 +255,11 @@
- 			exit(EXIT_SUCCESS); /* parent */
- 		/* if daemonizing, detach from stdio & ctty */
- 		setsid();
--		dup2(fd, 0);
--		dup2(fd, 1);
--		dup2(fd, 2);
-+		if (!(flags & DAEMON_NO_DUP2)) {
-+			dup2(fd, 0);
-+			dup2(fd, 1);
-+			dup2(fd, 2);
-+		}
- 		if (flags & DAEMON_DOUBLE_FORK) {
- 			/* On Linux, session leader can acquire ctty
- 			 * unknowingly, by opening a tty.
---- busybox-1.21.0/include/libbb.h	2013-01-20 00:37:42.000000000 +0100
-+++ busybox-1.21.0_patched/include/libbb.h	2016-09-28 12:06:13.341273749 +0200
-@@ -978,6 +978,7 @@
- 	DAEMON_CLOSE_EXTRA_FDS = 4,
- 	DAEMON_ONLY_SANITIZE = 8, /* internal use */
- 	DAEMON_DOUBLE_FORK = 16, /* double fork to avoid controlling tty */
-+	DAEMON_NO_DUP2 = 32,
- };
- #if BB_MMU
-   enum { re_execed = 0 };
+diff --git a/package/busybox/0003-start-stop-daemon-to-stdout.patch b/package/busybox/0003-start-stop-daemon-to-stdout.patch
+new file mode 100644
+index 0000000..1272307
+--- /dev/null
++++ b/package/busybox/0003-start-stop-daemon-to-stdout.patch
+@@ -0,0 +1,40 @@
++Do not block stdout when started application with start-stop-daemon
++
++--- busybox-1.21.0/debianutils/start_stop_daemon.c	2012-12-22 23:38:59.000000000 +0100
+++++ busybox-1.21.0_patched/debianutils/start_stop_daemon.c	2016-09-28 12:06:33.424959669 +0200
++@@ -485,7 +485,7 @@
++ 	*--argv = startas;
++ 	if (opt & OPT_BACKGROUND) {
++ #if BB_MMU
++-		bb_daemonize(DAEMON_DEVNULL_STDIO + DAEMON_CLOSE_EXTRA_FDS + DAEMON_DOUBLE_FORK);
+++		bb_daemonize(DAEMON_DOUBLE_FORK | DAEMON_NO_DUP2);
++ 		/* DAEMON_DEVNULL_STDIO is superfluous -
++ 		 * it's always done by bb_daemonize() */
++ #else
++--- busybox-1.21.0/libbb/vfork_daemon_rexec.c	2012-12-22 23:39:00.000000000 +0100
+++++ busybox-1.21.0_patched/libbb/vfork_daemon_rexec.c	2016-09-28 12:06:03.593426248 +0200
++@@ -255,9 +255,11 @@
++ 			exit(EXIT_SUCCESS); /* parent */
++ 		/* if daemonizing, detach from stdio & ctty */
++ 		setsid();
++-		dup2(fd, 0);
++-		dup2(fd, 1);
++-		dup2(fd, 2);
+++		if (!(flags & DAEMON_NO_DUP2)) {
+++			dup2(fd, 0);
+++			dup2(fd, 1);
+++			dup2(fd, 2);
+++		}
++ 		if (flags & DAEMON_DOUBLE_FORK) {
++ 			/* On Linux, session leader can acquire ctty
++ 			 * unknowingly, by opening a tty.
++--- busybox-1.21.0/include/libbb.h	2013-01-20 00:37:42.000000000 +0100
+++++ busybox-1.21.0_patched/include/libbb.h	2016-09-28 12:06:13.341273749 +0200
++@@ -978,6 +978,7 @@
++ 	DAEMON_CLOSE_EXTRA_FDS = 4,
++ 	DAEMON_ONLY_SANITIZE = 8, /* internal use */
++ 	DAEMON_DOUBLE_FORK = 16, /* double fork to avoid controlling tty */
+++	DAEMON_NO_DUP2 = 32,
++ };
++ #if BB_MMU
++   enum { re_execed = 0 };
