@@ -1,0 +1,12 @@
+diff --git a/package/busybox/busybox.mk b/package/busybox/busybox.mk
+index f17c20bf54..e1cb41fc70 100644
+--- a/package/busybox/busybox.mk
++++ b/package/busybox/busybox.mk
+@@ -221,6 +221,7 @@ define BUSYBOX_INSTALL_LOGGING_SCRIPT
+ 	if grep -q CONFIG_SYSLOGD=y $(@D)/.config; then \
+ 		$(INSTALL) -m 0755 -D package/busybox/S01logging \
+ 			$(TARGET_DIR)/etc/init.d/S01logging; \
++	else rm -f $(TARGET_DIR)/etc/init.d/S01logging; \
+ 	fi
+ endef
+ 
