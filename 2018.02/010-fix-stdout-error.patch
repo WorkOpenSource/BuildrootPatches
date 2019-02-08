@@ -1,0 +1,39 @@
+On some workstations (mainly Ubuntu) the compilation stops with the following error:
+
+    [...]/buildroot-2018.02.10/output/host/lib/gcc/powerpc-buildroot-linux-uclibcspe/7.3.0/plugin/include/b-header-vars
+    make[5]: Leaving directory
+    '[...]/buildroot-2018.02.10/output/build/host-gcc-final-7.3.0/build/gcc'
+    make[5]: write error: stdout
+    Makefile:4302: recipe for target 'install-gcc' failed
+
+It seems that disabling the parallel compilation would fix this error (more a workaround).
+
+diff --git a/package/gcc/gcc-final/gcc-final.mk b/package/gcc/gcc-final/gcc-final.mk
+index c27376ad00..e800d4b1e3 100644
+--- a/package/gcc/gcc-final/gcc-final.mk
++++ b/package/gcc/gcc-final/gcc-final.mk
+@@ -212,4 +212,10 @@ endef
+ HOST_GCC_FINAL_POST_INSTALL_HOOKS += HOST_GCC_FINAL_INSTALL_USR_LIBS
+ endif
+ 
++# taken from package/pkg-autotools.mk's $(2)_INSTALL_STAGING_CMDS
++define HOST_GCC_FINAL_INSTALL_STAGING_CMDS
++	$(TARGET_MAKE_ENV) $(HOST_GCC_FINAL_MAKE_ENV) $(MAKE1) $(HOST_GCC_FINAL_INSTALL_STAGING_OPTS) -C $(HOST_GCC_FINAL_SRCDIR)
++endef
++
++
+ $(eval $(host-autotools-package))
+diff --git a/package/gcc/gcc-initial/gcc-initial.mk b/package/gcc/gcc-initial/gcc-initial.mk
+index c476b2faeb..2d5611dafe 100644
+--- a/package/gcc/gcc-initial/gcc-initial.mk
++++ b/package/gcc/gcc-initial/gcc-initial.mk
+@@ -53,4 +53,9 @@ HOST_GCC_INITIAL_POST_BUILD_HOOKS += TOOLCHAIN_WRAPPER_BUILD
+ HOST_GCC_INITIAL_POST_INSTALL_HOOKS += TOOLCHAIN_WRAPPER_INSTALL
+ HOST_GCC_INITIAL_POST_INSTALL_HOOKS += HOST_GCC_INSTALL_WRAPPER_AND_SIMPLE_SYMLINKS
+ 
++# taken from package/pkg-autotools.mk's $(2)_INSTALL_STAGING_CMDS
++define GCC_INITIAL_INSTALL_STAGING_CMDS
++	$(TARGET_MAKE_ENV) $(GCC_INITIAL_MAKE_ENV) $(MAKE1) $(GCC_INITIAL_INSTALL_STAGING_OPTS) -C $(GCC_INITIAL_SRCDIR)
++endef
++
+ $(eval $(host-autotools-package))
