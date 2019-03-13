@@ -1,0 +1,28 @@
+Without this patch, building GCC 8.x fails with
+
+	checking for clock_t... yes
+	checking for F_SETLKW... yes
+	checking if mkdir takes one argument... no
+	*** Configuration powerpc-buildroot-linux-uclibcspe is obsolete.
+	*** Specify --enable-obsolete to build it anyway.
+	*** Support will be REMOVED in the next major release of GCC,
+	*** unless a maintainer comes forward.
+	Makefile:4191: recipe for target 'configure-gcc' failed
+	make[3]: *** [configure-gcc] Error 1
+
+Be aware, that powerpc-buildroot-linux-uclibcspe configuration is removed in GCC 9.x!
+
+diff --git a/package/gcc/gcc.mk b/package/gcc/gcc.mk
+index 5901624ea5..7df676ed0d 100644
+--- a/package/gcc/gcc.mk
++++ b/package/gcc/gcc.mk
+@@ -96,7 +96,8 @@ HOST_GCC_COMMON_CONF_OPTS = \
+ 	--with-mpc=$(HOST_DIR) \
+ 	--with-mpfr=$(HOST_DIR) \
+ 	--with-pkgversion="Buildroot $(BR2_VERSION_FULL)" \
+-	--with-bugurl="http://bugs.buildroot.net/"
++	--with-bugurl="http://bugs.buildroot.net/" \
++	--enable-obsolete
+ 
+ # Don't build documentation. It takes up extra space / build time,
+ # and sometimes needs specific makeinfo versions to work

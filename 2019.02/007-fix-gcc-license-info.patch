@@ -1,0 +1,46 @@
+Adding license information for GCC to avoid errors with 'make legal-info'
+
+
+diff --git a/package/gcc/gcc-final/gcc-final.mk b/package/gcc/gcc-final/gcc-final.mk
+index 213f3d7..47ad140 100644
+--- a/package/gcc/gcc-final/gcc-final.mk
++++ b/package/gcc/gcc-final/gcc-final.mk
+@@ -10,6 +10,9 @@ GCC_FINAL_SOURCE = $(GCC_SOURCE)
+ 
+ HOST_GCC_FINAL_DL_SUBDIR = gcc
+ 
++GCC_FINAL_LICENSE = $(GCC_LICENSE)
++GCC_FINAL_LICENSE_FILES = $(GCC_LICENSE_FILES)
++
+ HOST_GCC_FINAL_DEPENDENCIES = \
+ 	$(HOST_GCC_COMMON_DEPENDENCIES) \
+ 	$(BR_LIBC)
+diff --git a/package/gcc/gcc-initial/gcc-initial.mk b/package/gcc/gcc-initial/gcc-initial.mk
+index c476b2f..92ce924 100644
+--- a/package/gcc/gcc-initial/gcc-initial.mk
++++ b/package/gcc/gcc-initial/gcc-initial.mk
+@@ -13,6 +13,9 @@ GCC_INITIAL_SOURCE = $(GCC_SOURCE)
+ # users should not care about, while gcc-final is the one they shall see.
+ HOST_GCC_INITIAL_DL_SUBDIR = gcc
+ 
++GCC_INITIAL_LICENSE = $(GCC_LICENSE)
++GCC_INITIAL_LICENSE_FILES = $(GCC_LICENSE_FILES)
++
+ HOST_GCC_INITIAL_DEPENDENCIES = $(HOST_GCC_COMMON_DEPENDENCIES)
+ 
+ HOST_GCC_INITIAL_EXCLUDES = $(HOST_GCC_EXCLUDES)
+diff --git a/package/gcc/gcc.mk b/package/gcc/gcc.mk
+index 49ccccf..a1b4a4b 100644
+--- a/package/gcc/gcc.mk
++++ b/package/gcc/gcc.mk
+@@ -27,6 +27,10 @@ GCC_SOURCE = gcc-$(GCC_VERSION).tar.xz
+ endif
+ endif
+ 
++# Taken info from wikipedia
++GCC_LICENSE = GPL-3.0+ with GCC Runtime Library Exception
++GCC_LICENSE_FILES = COPYING COPYING.LIB COPYING.RUNTIME COPYING3 COPYING3.LIB
++
+ #
+ # Xtensa special hook
+ #

@@ -1,0 +1,21 @@
+It seems that the glib-server mode needs host-python:
+
+PATH=/home/kkr/Projects/aseries-axos/system/buildroot-2018.02.x/output/host/usr/bin/ \
+	 dbus-binding-tool --output=skip-dbus-export-generated.h --mode=glib-server \
+	 --prefix=skip_object skip-dbus.xml
+/usr/bin/env: 'python': No such file or directory
+
+
+diff --git a/package/dbus-glib/dbus-glib.mk b/package/dbus-glib/dbus-glib.mk
+index 2257c8e4f9..e47ae071ba 100644
+--- a/package/dbus-glib/dbus-glib.mk
++++ b/package/dbus-glib/dbus-glib.mk
+@@ -26,7 +26,7 @@ DBUS_GLIB_CONF_OPTS = \
+ 
+ DBUS_GLIB_DEPENDENCIES = host-pkgconf dbus host-dbus host-dbus-glib libglib2 expat
+ 
+-HOST_DBUS_GLIB_DEPENDENCIES = host-dbus host-expat host-libglib2
++HOST_DBUS_GLIB_DEPENDENCIES = host-dbus host-expat host-libglib2 host-python
+ 
+ HOST_DBUS_GLIB_CONF_OPTS = \
+ 	--disable-tests \

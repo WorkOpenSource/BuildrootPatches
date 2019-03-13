@@ -1,0 +1,40 @@
+Don't show dirty flag
+
+Since we use the official Buildroot tarball and patch it with our changes, we have
+a dirty Buildroot by definition. Since this is not a problem, we remove this flag
+from the kernel version.
+
+diff --git a/support/scripts/setlocalversion b/support/scripts/setlocalversion
+index 33cd605..cd4ee0e 100755
+--- a/support/scripts/setlocalversion
++++ b/support/scripts/setlocalversion
+@@ -43,10 +43,11 @@ if head=`git rev-parse --verify --short HEAD 2>/dev/null`; then
+ 	[ -w . ] && git update-index --refresh --unmerged > /dev/null
+ 
+ 	# Check for uncommitted changes
+-	if git diff-index --name-only HEAD | grep -v "^scripts/package" \
+-	    | read dummy; then
+-		printf '%s' -dirty
+-	fi
++# WORK: removed to ignore '-dirty' since we patch Buildroot on purpose
++#	if git diff-index --name-only HEAD | grep -v "^scripts/package" \
++#	    | read dummy; then
++#		printf '%s' -dirty
++#	fi
+ 
+ 	# All done with git
+ 	exit
+@@ -64,9 +65,10 @@ if hgid=`hg id 2>/dev/null`; then
+ 
+ 	# Are there uncommitted changes?
+ 	# These are represented by + after the changeset id.
+-	case "$hgid" in
+-		*+|*+\ *) printf '%s' -dirty ;;
+-	esac
++# WORK: removed to ignore '-dirty' since we patch Buildroot on purpose
++#	case "$hgid" in
++#		*+|*+\ *) printf '%s' -dirty ;;
++#	esac
+ 
+ 	# All done with mercurial
+ 	exit

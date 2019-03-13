@@ -1,0 +1,19 @@
+Enables host-shared flag
+
+Without this flag, gcc does not compile:
+
+relocation R_X86_64_32 against `.rodata' can not be used when making a shared object; recompile with -fPIC
+
+
+diff --git a/package/gcc/gcc.mk b/package/gcc/gcc.mk
+index 241f3575c..7ff8779d1 100644
+--- a/package/gcc/gcc.mk
++++ b/package/gcc/gcc.mk
+@@ -91,6 +91,7 @@ HOST_GCC_COMMON_CONF_OPTS = \
+ 	--with-gnu-ld \
+ 	--disable-libssp \
+ 	--disable-multilib \
++	--enable-host-shared \
+ 	--disable-decimal-float \
+ 	--with-gmp=$(HOST_DIR) \
+ 	--with-mpc=$(HOST_DIR) \
