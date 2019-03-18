@@ -1,0 +1,16 @@
+Without this patch IDEs like Qtcreator print these hash errors very
+prominent - especially at the 'legal-info'. This is not needed in our
+case.
+
+diff --git a/support/download/check-hash b/support/download/check-hash
+index fe9c10570e..cf3fb227d5 100755
+--- a/support/download/check-hash
++++ b/support/download/check-hash
+@@ -106,6 +106,6 @@ if [ ${nb_checks} -eq 0 ]; then
+         exit 0
+         ;;
+     esac
+-    printf "ERROR: No hash found for %s\n" "${base}" >&2
++    printf "INFO: No hash found for %s\n" "${base}"
+     exit 3
+ fi
