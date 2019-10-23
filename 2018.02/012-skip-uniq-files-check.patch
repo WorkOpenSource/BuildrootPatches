@@ -1,0 +1,29 @@
+Removing the annoying uniq-files-check:
+
+   Warning: host file "./share/doc/gettext/examples/hello-java/po/es.po" is touched by more than one package: [u'host-gettext', u'host-acl']
+   Warning: host file "./share/locale/pt_BR/LC_MESSAGES/util-linux.mo" is touched by more than one package: [u'host-util-linux', u'host-acl']
+   Warning: host file "./lib/libpython2.7.so.1.0" is touched by more than one package: [u'host-python', u'host-acl']
+   Warning: host file "./lib/python2.7/plistlib.pyc" is touched by more than one package: [u'host-python', u'host-acl']
+   Warning: host file "./lib/gcc/powerpc-buildroot-linux-uclibcspe/7.3.0/plugin/include/rtlhash.h" is touched by more than one package: [u'host-gcc-initial', u'host-gcc-final', u'host-acl']
+   Warning: host file "./powerpc-buildroot-linux-uclibcspe/include/c++/7.3.0/bits/regex_scanner.tcc" is touched by more than one package: [u'host-gcc-final', u'host-acl']
+   Warning: host file "./lib/python2.7/wsgiref/headers.pyc" is touched by more than one package: [u'host-python', u'host-acl']
+   Warning: host file "./share/gtk-doc/html/libxml2/general.html" is touched by more than one package: [u'host-libxml2', u'host-acl']
+
+
+diff --git a/Makefile b/Makefile
+index 04ba0ef091..480d0b23e7 100644
+--- a/Makefile
++++ b/Makefile
+@@ -709,9 +709,9 @@ $(TARGETS_ROOTFS): target-finalize
+ target-finalize: $(PACKAGES)
+ 	@$(call MESSAGE,"Finalizing target directory")
+ 	# Check files that are touched by more than one package
+-	./support/scripts/check-uniq-files -t target $(BUILD_DIR)/packages-file-list.txt
+-	./support/scripts/check-uniq-files -t staging $(BUILD_DIR)/packages-file-list-staging.txt
+-	./support/scripts/check-uniq-files -t host $(BUILD_DIR)/packages-file-list-host.txt
++	# KKR: ./support/scripts/check-uniq-files -t target $(BUILD_DIR)/packages-file-list.txt
++	# KKR: ./support/scripts/check-uniq-files -t staging $(BUILD_DIR)/packages-file-list-staging.txt
++	# KKR: ./support/scripts/check-uniq-files -t host $(BUILD_DIR)/packages-file-list-host.txt
+ 	$(foreach hook,$(TARGET_FINALIZE_HOOKS),$($(hook))$(sep))
+ 	rm -rf $(TARGET_DIR)/usr/include $(TARGET_DIR)/usr/share/aclocal \
+ 		$(TARGET_DIR)/usr/lib/pkgconfig $(TARGET_DIR)/usr/share/pkgconfig \
