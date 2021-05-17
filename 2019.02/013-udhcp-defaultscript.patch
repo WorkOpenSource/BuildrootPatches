@@ -1,0 +1,12 @@
+diff --git a/package/busybox/udhcpc.script b/package/busybox/udhcpc.script
+index d375b34c42..5bff51108b 100755
+--- a/package/busybox/udhcpc.script
++++ b/package/busybox/udhcpc.script
+@@ -93,6 +93,7 @@ case "$1" in
+ 			echo adding dns $i
+ 			echo "nameserver $i # $interface" >> $RESOLV_CONF
+ 		done
++		echo "nmsserverip $opt225 # $interface" >> $RESOLV_CONF
+ 		;;
+ esac
+ 
