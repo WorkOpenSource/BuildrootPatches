@@ -6,7 +6,7 @@ index d375b34c42..5bff51108b 100755
  			echo adding dns $i
  			echo "nameserver $i # $interface" >> $RESOLV_CONF
  		done
-+		echo "nmsserverip $opt225 # $interface" >> $RESOLV_CONF
++		echo "nmsserverip $opt251 # $interface" >> $RESOLV_CONF
  		;;
  esac
  
