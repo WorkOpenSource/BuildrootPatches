@@ -1,0 +1,38 @@
+If BR2_PRIMARY_SITE_ONLY=y, then BR2_LUAROCKS_MIRROR is not defined in
+Config.in so any lua package has its _SITE set to none so you get this error.
+There's a similar issue with the other mirrors, but those always have some path
+appended to them (e.g. $(BR2_GNU_MIRROR)/libc) so the _SITE is never empty.
+
+Bug: (Reproduce with make legal-info while BR2_PRIMARY_SITE_ONLY=y)
+package/coxpcall/coxpcall.mk:11: *** COXPCALL_SITE cannot
+     be empty when COXPCALL_SOURCE is not.  Stop.
+
+Resolves:
+http://autobuild.buildroot.net/results/e19/e196ceb333f554748081e78858eafb2739e0e317/
+
+Signed-off-by: Matt Weber <matt@thewebers.ws>
+---
+
+Thanks Arnout for the description of the bug (reused above).
+---
+ package/pkg-generic.mk | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/package/pkg-generic.mk b/package/pkg-generic.mk
+index ae03051..841b1ac 100644
+--- a/package/pkg-generic.mk
++++ b/package/pkg-generic.mk
+@@ -1073,11 +1073,13 @@ DL_TOOLS_DEPENDENCIES += $$(call extractor-dependency,$$($(2)_SOURCE))
+ 	$(1)-show-version \
+ 	$(1)-source
+ 
++ifneq ($(BR2_PRIMARY_SITE_ONLY),y)
+ ifneq ($$($(2)_SOURCE),)
+ ifeq ($$($(2)_SITE),)
+ $$(error $(2)_SITE cannot be empty when $(2)_SOURCE is not)
+ endif
+ endif
++endif
+ 
+ ifeq ($$(patsubst %/,ERROR,$$($(2)_SITE)),ERROR)
+ $$(error $(2)_SITE ($$($(2)_SITE)) cannot have a trailing slash)
