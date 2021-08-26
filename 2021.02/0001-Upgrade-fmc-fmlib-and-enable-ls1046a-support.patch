@@ -1,0 +1,122 @@
+From b5d16d3b878f4dddecce4007bc405844dba023ae Mon Sep 17 00:00:00 2001
+From: Johannes Agricola <johannes.agricola@work-microwave.com>
+Date: Thu, 26 Aug 2021 22:27:57 +0200
+Subject: [PATCH] Upgrade fmc, fmlib and enable ls1046a support
+
+---
+ package/fmc/Config.in    |  2 +-
+ package/fmc/fmc.hash     |  2 +-
+ package/fmc/fmc.mk       |  4 ++--
+ package/fmlib/Config.in  | 10 ++++++++--
+ package/fmlib/fmlib.hash |  5 +++--
+ package/fmlib/fmlib.mk   |  4 ++--
+ 6 files changed, 17 insertions(+), 10 deletions(-)
+
+diff --git a/package/fmc/Config.in b/package/fmc/Config.in
+index 4399aa2cab..ad9007399d 100644
+--- a/package/fmc/Config.in
++++ b/package/fmc/Config.in
+@@ -8,7 +8,7 @@ comment "fmc needs a Linux kernel to be built"
+ 
+ config BR2_PACKAGE_FMC
+ 	bool "fmc"
+-	depends on BR2_powerpc_e500mc || BR2_powerpc_e6500
++	depends on BR2_powerpc_e500mc || BR2_powerpc_e6500 || BR2_aarch64
+ 	depends on BR2_INSTALL_LIBSTDCPP
+ 	depends on BR2_LINUX_KERNEL # fmlib
+ 	select BR2_PACKAGE_TCLAP
+diff --git a/package/fmc/fmc.hash b/package/fmc/fmc.hash
+index fed33091cd..8bca32738d 100644
+--- a/package/fmc/fmc.hash
++++ b/package/fmc/fmc.hash
+@@ -1,3 +1,3 @@
+ # Locally calculated
+-sha256  cb896ec1fac2fe9a3a9bb8be2221b79acf5f9b75841609a681db0d9e7bec02a0  fmc-fsl-sdk-v2.0-br1.tar.gz
++sha256  1bd4a60784c7a582d200464dd0d5745a903c360d3e1ca8d4a01ca70830760b9c  fmc-lf-5.10.y-1.0.0-br1.tar.gz
+ sha256  f92862ceb95db5492f50a59d7c799c9395b714db88db92d11891dc0233e2ac42  COPYING
+diff --git a/package/fmc/fmc.mk b/package/fmc/fmc.mk
+index b385730138..ea04761717 100644
+--- a/package/fmc/fmc.mk
++++ b/package/fmc/fmc.mk
+@@ -4,8 +4,8 @@
+ #
+ ################################################################################
+ 
+-FMC_VERSION = fsl-sdk-v2.0
+-FMC_SITE = https://source.codeaurora.org/external/qoriq/qoriq-yocto-sdk/fmc
++FMC_VERSION = lf-5.10.y-1.0.0
++FMC_SITE = git://source.codeaurora.org/external/qoriq/qoriq-components/fmc
+ FMC_SITE_METHOD = git
+ FMC_LICENSE = MIT
+ FMC_LICENSE_FILES = COPYING
+diff --git a/package/fmlib/Config.in b/package/fmlib/Config.in
+index df4ae440ea..15f15d4634 100644
+--- a/package/fmlib/Config.in
++++ b/package/fmlib/Config.in
+@@ -1,10 +1,10 @@
+ comment "fmlib needs a Linux kernel to be built"
+-	depends on BR2_powerpc_e500mc || BR2_powerpc_e6500
++	depends on BR2_powerpc_e500mc || BR2_powerpc_e6500 || BR2_aarch64
+ 	depends on !BR2_LINUX_KERNEL
+ 
+ config BR2_PACKAGE_FMLIB
+ 	bool "fmlib"
+-	depends on BR2_powerpc_e500mc || BR2_powerpc_e6500
++	depends on BR2_powerpc_e500mc || BR2_powerpc_e6500 || BR2_aarch64
+ 	depends on BR2_LINUX_KERNEL
+ 	help
+ 	  The Frame Manager library provides Freescale PowerPC platforms
+@@ -33,6 +33,10 @@ config BR2_FMLIB_QORIQ_FAMILY_T2080
+ 	bool "t208x"
+ 	depends on BR2_powerpc_e6500
+ 
++config BR2_FMLIB_QORIQ_FAMILY_LS1046a
++	bool "LS1046A"
++	depends on BR2_aarch64
++
+ endchoice
+ 
+ config BR2_PACKAGE_FMLIB_ARCHTYPE
+@@ -40,11 +44,13 @@ config BR2_PACKAGE_FMLIB_ARCHTYPE
+ 	default "e500mc" if BR2_powerpc_e500mc
+ 	default "ppc64e6500" if BR2_powerpc_e6500 && BR2_powerpc64
+ 	default "ppc32e6500" if BR2_powerpc_e6500 && BR2_powerpc
++	default "arm" if BR2_aarch64
+ 
+ config BR2_PACKAGE_FMLIB_PLATFORM
+ 	string
+ 	default "P4080" if BR2_FMLIB_QORIQ_FAMILY_P4080
+ 	default "T4240" if BR2_FMLIB_QORIQ_FAMILY_T4240
+ 	default "FMAN_V3H" if BR2_FMLIB_QORIQ_FAMILY_T2080
++	default "ls1043" if BR2_FMLIB_QORIQ_FAMILY_LS1046a
+ 
+ endif
+diff --git a/package/fmlib/fmlib.hash b/package/fmlib/fmlib.hash
+index 47460d091c..61a0e2d3a5 100644
+--- a/package/fmlib/fmlib.hash
++++ b/package/fmlib/fmlib.hash
+@@ -1,3 +1,4 @@
+ # Locally computed
+-sha256  59415d346af1d22f510f2785be4c7e3606dc3181476a666e832270550f7d44a6  fmlib-fsl-sdk-v2.0-br1.tar.gz
+-sha256  837559e20d83910a005e7883b876cc5c42805fe4abcf7e5c5b3c8d036b7f61c8  COPYING
++sha256  589d95f56df82f9f2be9a8f103633f3481817cc7c3881636f4c04b6c90271043  fmlib-lf-5.10.y-1.0.0-br1.tar.gz
++sha256  5d7770fa9f70f0c6f0b4784bbca8401811259a4b1e03455dbd863ffd0d34d2ca  COPYING
++
+diff --git a/package/fmlib/fmlib.mk b/package/fmlib/fmlib.mk
+index 8cb779201d..058586d1d5 100644
+--- a/package/fmlib/fmlib.mk
++++ b/package/fmlib/fmlib.mk
+@@ -4,8 +4,8 @@
+ #
+ ################################################################################
+ 
+-FMLIB_VERSION = fsl-sdk-v2.0
+-FMLIB_SITE = https://source.codeaurora.org/external/qoriq/qoriq-yocto-sdk/fmlib
++FMLIB_VERSION = lf-5.10.y-1.0.0
++FMLIB_SITE = git://source.codeaurora.org/external/qoriq/qoriq-components/fmlib
+ FMLIB_SITE_METHOD = git
+ FMLIB_LICENSE = BSD-3-Clause, GPL-2.0+
+ FMLIB_LICENSE_FILES = COPYING
+-- 
+2.25.1
+
