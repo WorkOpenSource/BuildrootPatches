@@ -1,0 +1,31 @@
+From 5c84b313418fd320c16886841c2009f4f477c404 Mon Sep 17 00:00:00 2001
+From: Johannes Agricola <johannes.agricola@work-microwave.com>
+Date: Mon, 4 Mar 2024 22:32:24 +0100
+Subject: [PATCH] Always enable mod_tls
+
+---
+ package/proftpd/proftpd.mk | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/package/proftpd/proftpd.mk b/package/proftpd/proftpd.mk
+index d2a652f631..8ecc777de2 100644
+--- a/package/proftpd/proftpd.mk
++++ b/package/proftpd/proftpd.mk
+@@ -43,13 +43,9 @@ else
+ PROFTPD_CONF_OPTS += --disable-redis
+ endif
+ 
+-ifeq ($(BR2_PACKAGE_PROFTPD_MOD_SFTP),y)
+ PROFTPD_CONF_OPTS += --enable-openssl
+-PROFTPD_MODULES += mod_sftp
++PROFTPD_MODULES += mod_tls
+ PROFTPD_DEPENDENCIES += openssl
+-else
+-PROFTPD_CONF_OPTS += --disable-openssl
+-endif
+ 
+ ifeq ($(BR2_PACKAGE_PROFTPD_MOD_SQL),y)
+ PROFTPD_MODULES += mod_sql
+-- 
+2.25.1
+
